@@ -2,8 +2,23 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>FluentPath — Curso de Inglês Interativo (A1 ao C2)</title>
+
+  <!-- Meta Tags PWA & Mobile (Android & iOS) -->
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FluentPath" />
+  <meta name="application-name" content="FluentPath" />
+  <meta name="description" content="Curso de inglês interativo completo do Básico (A1) ao Avançado (C2) com áudio nativo, flashcards 3D e quizzes." />
+
+  <!-- Favicon SVG Personalizado Inline (Globo/Balão de Fala + FP) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234f46e5'/%3E%3Cstop offset='100%25' stop-color='%237c3aed'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='url(%23g)'/%3E%3Cpath d='M22 28c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v28c0 6.6-5.4 12-12 12H44l-14 12v-12h-2c-3.3 0-6-2.7-6-6V28z' fill='rgba(255,255,255,0.16)'/%3E%3Ccircle cx='74' cy='26' r='8' fill='%2334d399'/%3E%3Ctext x='50' y='56' font-family='system-ui,-apple-system,sans-serif' font-weight='800' font-size='34' fill='%23ffffff' text-anchor='middle' letter-spacing='-1'%3EFP%3C/text%3E%3C/svg%3E" />
+  <!-- Apple Touch Icon (será atualizado dinamicamente para PNG 192x192 via Canvas) -->
+  <link id="apple-touch-icon" rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%234f46e5'/%3E%3Ctext x='50' y='62' font-family='sans-serif' font-weight='800' font-size='38' fill='%23ffffff' text-anchor='middle'%3EFP%3C/text%3E%3C/svg%3E" />
+
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Inter & Plus Jakarta Sans -->
@@ -33,6 +48,12 @@
     }
   </script>
   <style>
+    /* Suporte a áreas seguras (Notch/Barra inferior no iOS e Android) */
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      -webkit-tap-highlight-color: transparent;
+    }
     /* Efeito 3D para os Flashcards */
     .perspective-1000 {
       perspective: 1000px;
@@ -67,11 +88,12 @@
 
   <!-- Barra de Navegação Superior -->
   <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2.5">
       <!-- Logo / Voltar para Início -->
       <button onclick="app.goHome()" class="flex items-center gap-2.5 text-left group focus:outline-none">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-display font-extrabold text-xl shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-display font-extrabold text-xl shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform relative">
           FP
+          <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-white dark:border-slate-900"></span>
         </div>
         <div>
           <span class="font-display font-extrabold text-lg tracking-tight block leading-none text-slate-900 dark:text-white">FluentPath</span>
@@ -81,36 +103,41 @@
 
       <!-- Seletor Rápido de Nível no Topo -->
       <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/70 dark:border-slate-700/70 order-3 sm:order-2 w-full sm:w-auto justify-between sm:justify-start">
-        <button onclick="app.selectLevel('basic')" id="nav-lvl-basic" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all">
+        <button onclick="app.selectLevel('basic')" id="nav-lvl-basic" class="flex-1 sm:flex-initial px-3.5 py-2 sm:py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all">
           🌱 Básico
         </button>
-        <button onclick="app.selectLevel('intermediate')" id="nav-lvl-intermediate" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all">
+        <button onclick="app.selectLevel('intermediate')" id="nav-lvl-intermediate" class="flex-1 sm:flex-initial px-3.5 py-2 sm:py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all">
           🚀 Intermediário
         </button>
-        <button onclick="app.selectLevel('advanced')" id="nav-lvl-advanced" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all">
+        <button onclick="app.selectLevel('advanced')" id="nav-lvl-advanced" class="flex-1 sm:flex-initial px-3.5 py-2 sm:py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all">
           👑 Avançado
         </button>
       </div>
 
-      <!-- Indicadores de Gamificação & Tema -->
-      <div class="flex items-center gap-2 sm:gap-3 order-2 sm:order-3">
+      <!-- Indicadores de Gamificação, Instalação Mobile & Tema -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5 order-2 sm:order-3">
+        <!-- Botão Inteligente de Instalação PWA no Celular -->
+        <button id="btn-install-pwa" onclick="app.triggerInstallPWA()" title="Instalar aplicativo no celular" class="hidden items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white px-3 py-2 rounded-xl text-xs font-extrabold shadow-sm shadow-indigo-500/25 active:scale-95 transition-all">
+          <span>📲</span>
+          <span>Instalar App</span>
+        </button>
         <!-- Ofensiva / Streak -->
-        <div title="Dias seguidos estudando" class="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 px-3 py-1.5 rounded-xl border border-amber-200/60 dark:border-amber-800/50 font-bold text-sm">
+        <div title="Dias seguidos estudando" class="flex items-center gap-1 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 px-2.5 py-2 rounded-xl border border-amber-200/60 dark:border-amber-800/50 font-bold text-xs sm:text-sm">
           <span>🔥</span>
           <span id="stat-streak">1</span>
         </div>
         <!-- XP Total -->
-        <div title="Pontos de Experiência (XP)" class="flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-xl border border-indigo-200/60 dark:border-indigo-800/50 font-bold text-sm">
+        <div title="Pontos de Experiência (XP)" class="flex items-center gap-1 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 px-2.5 py-2 rounded-xl border border-indigo-200/60 dark:border-indigo-800/50 font-bold text-xs sm:text-sm">
           <span>⚡</span>
           <span id="stat-xp">0</span> <span class="hidden md:inline text-xs font-semibold">XP</span>
         </div>
         <!-- Botão Medalhas -->
-        <button onclick="app.toggleBadgesModal(true)" title="Suas Conquistas e Medalhas" class="relative p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+        <button onclick="app.toggleBadgesModal(true)" title="Suas Conquistas e Medalhas" class="relative p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
           🏆
           <span id="badge-count-pill" class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">0</span>
         </button>
         <!-- Alternar Tema Claro/Escuro -->
-        <button onclick="app.toggleDarkMode()" title="Alternar Tema" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+        <button onclick="app.toggleDarkMode()" title="Alternar Tema" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
           <span id="theme-icon">🌙</span>
         </button>
       </div>
@@ -124,6 +151,34 @@
 
   <!-- Notificação Toast Customizada (Substitui alert) -->
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Modal de Instruções de Instalação no Celular (iOS / Safari / Navegadores) -->
+  <div id="install-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/65 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-fade-in">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-display font-extrabold text-lg shadow-md">
+            FP
+          </div>
+          <div>
+            <h3 class="font-display font-extrabold text-lg leading-tight">Instalar FluentPath</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Acesse direto da tela inicial do celular</p>
+          </div>
+        </div>
+        <button onclick="app.toggleInstallModal(false)" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <div id="install-instructions-body" class="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+        <!-- Preenchido dinamicamente conforme iOS ou Android/Desktop -->
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button onclick="app.toggleInstallModal(false)" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-colors">
+          Entendi!
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal de Conquistas / Medalhas -->
   <div id="badges-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
@@ -154,11 +209,211 @@
   <footer class="border-t border-slate-200 dark:border-slate-800 py-5 mt-10 text-center text-xs text-slate-500 dark:text-slate-400">
     <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
       <p><strong>FluentPath</strong> — Plataforma Interativa de Aprendizado de Inglês (CEFR A1 a C2).</p>
-      <p>Áudio nativo via Web Speech API • Seu progresso é salvo automaticamente neste navegador.</p>
+      <p>PWA Instalável • Áudio nativo via Web Speech API • Progresso salvo no dispositivo.</p>
     </div>
   </footer>
 
   <script>
+    /**
+     * CONFIGURAÇÃO PROGRESSIVE WEB APP (PWA) DINÂMICA EM ARQUIVO ÚNICO
+     * 1. Gera ícones PNG 192x192 e 512x512 via HTML5 Canvas API.
+     * 2. Injeta <link rel="manifest"> dinâmico via Blob URL e atualiza apple-touch-icon.
+     * 3. Registra Service Worker inline para cache e suporte offline.
+     * 4. Gerencia prompt nativo de instalação (Android/Chrome) e guia visual (iOS/Safari).
+     */
+    const pwaManager = {
+      deferredPrompt: null,
+      isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream,
+      isStandalone: window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true,
+
+      init() {
+        try {
+          const icon192 = this.generatePNGIcon(192);
+          const icon512 = this.generatePNGIcon(512);
+
+          // Atualiza ícone para tela inicial do iOS (Apple Touch Icon)
+          const appleIconLink = document.getElementById('apple-touch-icon');
+          if (appleIconLink && icon192) {
+            appleIconLink.href = icon192;
+          }
+
+          // Cria e injeta Web App Manifest dinâmico
+          const manifestObj = {
+            name: 'FluentPath - Curso de Inglês',
+            short_name: 'FluentPath',
+            description: 'Curso completo de inglês interativo do nível Básico (A1-A2) ao Avançado (C1-C2).',
+            start_url: window.location.href,
+            scope: './',
+            display: 'standalone',
+            orientation: 'portrait',
+            background_color: '#0f172a',
+            theme_color: '#4f46e5',
+            categories: ['education', 'productivity'],
+            icons: [
+              {
+                src: icon192,
+                sizes: '192x192',
+                type: 'image/png',
+                purpose: 'any maskable'
+              },
+              {
+                src: icon512,
+                sizes: '512x512',
+                type: 'image/png',
+                purpose: 'any maskable'
+              }
+            ]
+          };
+
+          const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+          const manifestURL = URL.createObjectURL(manifestBlob);
+          const manifestLink = document.createElement('link');
+          manifestLink.rel = 'manifest';
+          manifestLink.href = manifestURL;
+          document.head.appendChild(manifestLink);
+
+          // Registra Service Worker inline para conformidade PWA
+          this.registerInlineServiceWorker();
+
+          // Configura visibilidade do botão de instalação
+          this.setupInstallButton();
+        } catch (err) {
+          console.warn('Aviso ao inicializar recursos PWA:', err);
+        }
+      },
+
+      // Desenha o ícone oficial do FluentPath em Canvas e exporta como PNG Data URL
+      generatePNGIcon(size) {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return '';
+
+        // Fundo com gradiente Índigo -> Violeta
+        const grad = ctx.createLinearGradient(0, 0, size, size);
+        grad.addColorStop(0, '#4f46e5');
+        grad.addColorStop(1, '#7c3aed');
+
+        // Retângulo com cantos arredondados
+        const radius = size * 0.22;
+        ctx.beginPath();
+        ctx.moveTo(radius, 0);
+        ctx.lineTo(size - radius, 0);
+        ctx.quadraticCurveTo(size, 0, size, radius);
+        ctx.lineTo(size, size - radius);
+        ctx.quadraticCurveTo(size, size, size - radius, size);
+        ctx.lineTo(radius, size);
+        ctx.quadraticCurveTo(0, size, 0, size - radius);
+        ctx.lineTo(0, radius);
+        ctx.quadraticCurveTo(0, 0, radius, 0);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Balão de fala translúcido ao fundo
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        const pad = size * 0.2;
+        const bw = size * 0.6;
+        const bh = size * 0.5;
+        const br = size * 0.12;
+        ctx.beginPath();
+        ctx.roundRect(pad, pad, bw, bh, br);
+        ctx.fill();
+
+        // Triângulo do balão de fala
+        ctx.beginPath();
+        ctx.moveTo(pad + bw * 0.22, pad + bh);
+        ctx.lineTo(pad + bw * 0.15, pad + bh + size * 0.1);
+        ctx.lineTo(pad + bw * 0.42, pad + bh);
+        ctx.closePath();
+        ctx.fill();
+
+        // Selo verde esmeralda no canto superior direito
+        ctx.beginPath();
+        ctx.arc(size * 0.75, size * 0.25, size * 0.075, 0, Math.PI * 2);
+        ctx.fillStyle = '#34d399';
+        ctx.fill();
+
+        // Tipografia "FP" centralizada
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `800 ${Math.round(size * 0.36)}px "Plus Jakarta Sans", Inter, system-ui, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('FP', size * 0.5, size * 0.48);
+
+        return canvas.toDataURL('image/png');
+      },
+
+      // Registra Service Worker leve via Blob URL (com fallback seguro em iframes/sandbox)
+      registerInlineServiceWorker() {
+        if (!('serviceWorker' in navigator)) return;
+        try {
+          const swCode = `
+            const CACHE_NAME = 'fluentpath-pwa-v1';
+            self.addEventListener('install', (event) => {
+              self.skipWaiting();
+            });
+            self.addEventListener('activate', (event) => {
+              event.waitUntil(self.clients.claim());
+            });
+            self.addEventListener('fetch', (event) => {
+              if (event.request.method !== 'GET') return;
+              event.respondWith(
+                fetch(event.request)
+                  .then((response) => {
+                    const copy = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)).catch(() => {});
+                    return response;
+                  })
+                  .catch(() => caches.match(event.request))
+              );
+            });
+          `;
+          const swBlob = new Blob([swCode], { type: 'application/javascript' });
+          const swUrl = URL.createObjectURL(swBlob);
+          navigator.serviceWorker.register(swUrl).catch(() => {
+            // Ambientes de preview em iFrame/blob podem bloquear registro de SW silenciosamente
+          });
+        } catch (e) {
+          // Ignora silenciosamente se restrito pelo ambiente
+        }
+      },
+
+      setupInstallButton() {
+        const installBtn = document.getElementById('btn-install-pwa');
+        if (!installBtn) return;
+
+        // Se já está instalado e aberto como app standalone, mantém oculto
+        if (this.isStandalone) {
+          installBtn.classList.add('hidden');
+          return;
+        }
+
+        // Captura evento nativo de instalação no Android / Chrome / Edge
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          this.deferredPrompt = e;
+          installBtn.classList.remove('hidden');
+          installBtn.classList.add('inline-flex');
+        });
+
+        // Oculta botão assim que o usuário concluir a instalação
+        window.addEventListener('appinstalled', () => {
+          this.deferredPrompt = null;
+          installBtn.classList.add('hidden');
+          installBtn.classList.remove('inline-flex');
+          app.showToast('FluentPath instalado com sucesso no seu dispositivo! 🎉', 'success');
+        });
+
+        // No iOS (Safari) não existe beforeinstallprompt; exibimos botão com guia visual
+        if (this.isIOS) {
+          installBtn.classList.remove('hidden');
+          installBtn.classList.add('inline-flex');
+        }
+      }
+    };
+
     /**
      * BANCO DE DADOS COMPLETO DO CURSO DE INGLÊS
      * Estruturado em 3 Níveis (Básico A1-A2, Intermediário B1-B2, Avançado C1-C2)
@@ -1116,11 +1371,62 @@
           const btn = document.getElementById(`nav-lvl-${lvl}`);
           if (!btn) return;
           if (this.state.currentLevel === lvl) {
-            btn.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition-all';
+            btn.className = 'flex-1 sm:flex-initial px-3.5 py-2 sm:py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition-all';
           } else {
-            btn.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
+            btn.className = 'flex-1 sm:flex-initial px-3.5 py-2 sm:py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
           }
         });
+      },
+
+      // Dispara instalação nativa PWA ou abre guia passo a passo para iOS
+      async triggerInstallPWA() {
+        if (pwaManager.deferredPrompt) {
+          pwaManager.deferredPrompt.prompt();
+          const { outcome } = await pwaManager.deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            pwaManager.deferredPrompt = null;
+          }
+        } else {
+          this.toggleInstallModal(true);
+        }
+      },
+
+      // Controla o Modal de Instruções de Instalação Mobile
+      toggleInstallModal(show) {
+        const modal = document.getElementById('install-modal');
+        const body = document.getElementById('install-instructions-body');
+        if (!modal || !body) return;
+
+        if (show) {
+          if (pwaManager.isIOS) {
+            body.innerHTML = `
+              <div class="p-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800/60">
+                <p class="font-bold text-indigo-700 dark:text-indigo-300 mb-1">Como instalar no iPhone / iPad (Safari):</p>
+                <ol class="list-decimal list-inside space-y-2 text-xs sm:text-sm">
+                  <li>Toque no ícone de <strong>Compartilhar</strong> <span class="inline-block px-1.5 py-0.5 bg-white dark:bg-slate-800 rounded border border-slate-300 dark:border-slate-700 font-bold">⍗</span> na barra inferior do Safari.</li>
+                  <li>Role as opções para baixo e toque em <strong>"Adicionar à Tela de Início"</strong> (Add to Home Screen).</li>
+                  <li>Toque em <strong>Adicionar</strong> no canto superior direito. O ícone do <strong>FluentPath</strong> aparecerá junto aos seus apps!</li>
+                </ol>
+              </div>
+            `;
+          } else {
+            body.innerHTML = `
+              <div class="p-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800/60">
+                <p class="font-bold text-indigo-700 dark:text-indigo-300 mb-1">Como instalar no Android / Chrome:</p>
+                <ol class="list-decimal list-inside space-y-2 text-xs sm:text-sm">
+                  <li>Abra o menu do navegador tocando nos <strong>3 pontinhos (⋮)</strong> no canto superior direito.</li>
+                  <li>Selecione <strong>"Instalar aplicativo"</strong> ou <strong>"Adicionar à tela inicial"</strong>.</li>
+                  <li>Confirme em <strong>Instalar</strong> para abrir o FluentPath em tela cheia como um app nativo.</li>
+                </ol>
+              </div>
+            `;
+          }
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
       },
 
       // Renderização Principal
@@ -1648,7 +1954,10 @@
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
 
-    window.addEventListener('DOMContentLoaded', () => app.init());
+    window.addEventListener('DOMContentLoaded', () => {
+      pwaManager.init();
+      app.init();
+    });
   </script>
 </body>
 </html>
