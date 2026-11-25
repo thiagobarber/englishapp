@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FluentPath — Curso de Inglês Interativo (A1 ao C2)</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Efeito 3D para os Flashcards */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    /* Animação suave de entrada */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeSlideUp 0.35s ease-out forwards;
+    }
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200 selection:bg-indigo-500 selection:text-white">
+
+  <!-- Barra de Navegação Superior -->
+  <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Logo / Voltar para Início -->
+      <button onclick="app.goHome()" class="flex items-center gap-2.5 text-left group focus:outline-none">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-display font-extrabold text-xl shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+          FP
+        </div>
+        <div>
+          <span class="font-display font-extrabold text-lg tracking-tight block leading-none text-slate-900 dark:text-white">FluentPath</span>
+          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Inglês do Zero à Fluência</span>
+        </div>
+      </button>
+
+      <!-- Seletor Rápido de Nível no Topo -->
+      <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-200/70 dark:border-slate-700/70 order-3 sm:order-2 w-full sm:w-auto justify-between sm:justify-start">
+        <button onclick="app.selectLevel('basic')" id="nav-lvl-basic" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all">
+          🌱 Básico
+        </button>
+        <button onclick="app.selectLevel('intermediate')" id="nav-lvl-intermediate" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all">
+          🚀 Intermediário
+        </button>
+        <button onclick="app.selectLevel('advanced')" id="nav-lvl-advanced" class="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all">
+          👑 Avançado
+        </button>
+      </div>
+
+      <!-- Indicadores de Gamificação & Tema -->
+      <div class="flex items-center gap-2 sm:gap-3 order-2 sm:order-3">
+        <!-- Ofensiva / Streak -->
+        <div title="Dias seguidos estudando" class="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 px-3 py-1.5 rounded-xl border border-amber-200/60 dark:border-amber-800/50 font-bold text-sm">
+          <span>🔥</span>
+          <span id="stat-streak">1</span>
+        </div>
+        <!-- XP Total -->
+        <div title="Pontos de Experiência (XP)" class="flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-xl border border-indigo-200/60 dark:border-indigo-800/50 font-bold text-sm">
+          <span>⚡</span>
+          <span id="stat-xp">0</span> <span class="hidden md:inline text-xs font-semibold">XP</span>
+        </div>
+        <!-- Botão Medalhas -->
+        <button onclick="app.toggleBadgesModal(true)" title="Suas Conquistas e Medalhas" class="relative p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+          🏆
+          <span id="badge-count-pill" class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+        </button>
+        <!-- Alternar Tema Claro/Escuro -->
+        <button onclick="app.toggleDarkMode()" title="Alternar Tema" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+          <span id="theme-icon">🌙</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal Dinâmico -->
+  <main id="app-root" class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8">
+    <!-- Renderizado via JavaScript -->
+  </main>
+
+  <!-- Notificação Toast Customizada (Substitui alert) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Modal de Conquistas / Medalhas -->
+  <div id="badges-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl animate-fade-in">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🏆</span>
+          <h3 class="font-display font-extrabold text-xl">Conquistas e Medalhas</h3>
+        </div>
+        <button onclick="app.toggleBadgesModal(false)" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center font-bold">✕</button>
+      </div>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-5">Complete lições e domine os níveis para desbloquear todas as medalhas do curso.</p>
+      <div id="badges-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto pr-1">
+        <!-- Preenchido via JS -->
+      </div>
+      <div class="mt-6 flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
+        <button onclick="app.confirmResetProgress()" id="btn-reset-progress" class="text-xs text-rose-500 hover:text-rose-600 font-semibold underline">
+          Resetar progresso salvo
+        </button>
+        <button onclick="app.toggleBadgesModal(false)" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-colors">
+          Continuar Estudando
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rodapé -->
+  <footer class="border-t border-slate-200 dark:border-slate-800 py-5 mt-10 text-center text-xs text-slate-500 dark:text-slate-400">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p><strong>FluentPath</strong> — Plataforma Interativa de Aprendizado de Inglês (CEFR A1 a C2).</p>
+      <p>Áudio nativo via Web Speech API • Seu progresso é salvo automaticamente neste navegador.</p>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * BANCO DE DADOS COMPLETO DO CURSO DE INGLÊS
+     * Estruturado em 3 Níveis (Básico A1-A2, Intermediário B1-B2, Avançado C1-C2)
+     * Cada lição contém: Guia Gramatical, Vocabulário com Áudio, Flashcards e Quiz Comentado.
+     */
+    const COURSE_DATA = {
+      basic: {
+        id: 'basic',
+        title: 'Nível Básico',
+        cefr: 'A1 – A2',
+        icon: '🌱',
+        color: 'emerald',
+        description: 'Construa sua base sólida: cumprimentos, verbo To Be, rotina diária, presente simples, compras e como pedir direções.',
+        lessons: [
+          {
+            id: 'b1',
+            number: 1,
+            title: 'Saudações, Apresentações & Verbo To Be',
+            duration: '10 min',
+            xp: 50,
+            summary: 'Aprenda a se apresentar, cumprimentar pessoas em diferentes horários e dominar o verbo mais importante do inglês.',
+            grammar: {
+              title: 'O Verbo To Be (Ser / Estar)',
+              intro: 'Em inglês, o verbo <strong>To Be</strong> significa tanto <em>ser</em> quanto <em>estar</em>, dependendo do contexto. No presente, ele possui três formas principais: <strong>am, is, are</strong>.',
+              points: [
+                { rule: 'I am (I’m)', desc: 'Usado apenas para a primeira pessoa do singular (Eu sou / Eu estou).' },
+                { rule: 'He / She / It is (He’s / She’s / It’s)', desc: 'Usado para ele, ela ou objetos/animais no singular.' },
+                { rule: 'You / We / They are (You’re / We’re / They’re)', desc: 'Usado para você(s), nós e eles/elas.' },
+                { rule: 'Forma Negativa & Perguntas', desc: 'Para negar, adicione <strong>not</strong> (I am not / She isn’t). Para perguntar, inverta o verbo: <strong>Are you</strong> ready?' }
+              ],
+              examples: [
+                { en: 'Hi! I am Lucas and I am from Brazil.', pt: 'Oi! Eu sou o Lucas e sou do Brasil.' },
+                { en: 'She is very happy today.', pt: 'Ela está muito feliz hoje.' },
+                { en: 'Are they your friends?', pt: 'Eles são seus amigos?' }
+              ]
+            },
+            vocabulary: [
+              { en: 'Good morning! How are you?', pt: 'Bom dia! Como você está?', phonetic: '/ɡʊd ˈmɔːrnɪŋ haʊ ɑːr juː/' },
+              { en: 'Nice to meet you!', pt: 'Prazer em conhecer você!', phonetic: '/naɪs tə miːt juː/' },
+              { en: 'I am a software developer.', pt: 'Eu sou desenvolvedor de software.', phonetic: '/aɪ æm ə ˈsɔːftwer dɪˈveləpər/' },
+              { en: 'Where are you from?', pt: 'De onde você é?', phonetic: '/wer ɑːr juː frɒm/' },
+              { en: 'See you tomorrow!', pt: 'Até amanhã!', phonetic: '/siː juː təˈmɒroʊ/' },
+              { en: 'Excuse me, thank you so much.', pt: 'Com licença, muito obrigado.', phonetic: '/ɪkˈskjuːz miː θæŋk juː soʊ mʌtʃ/' }
+            ],
+            flashcards: [
+              { front: 'Nice to meet you', back: 'Prazer em conhecê-lo(a)', hint: 'Usado ao conhecer alguém pela primeira vez' },
+              { front: 'Where are you from?', back: 'De onde você é?', hint: 'Pergunta sobre nacionalidade ou cidade' },
+              { front: 'She is not (isn’t) tired', back: 'Ela não está cansada', hint: 'Forma negativa do To Be para "She"' },
+              { front: 'How is it going?', back: 'Como vão as coisas? / Tudo bem?', hint: 'Cumprimento informal muito comum' },
+              { front: 'Have a great day!', back: 'Tenha um ótimo dia!', hint: 'Despedida educada' }
+            ],
+            quiz: [
+              {
+                question: 'Complete corretamente: "Maria and Pedro _____ from São Paulo."',
+                options: ['am', 'is', 'are', 'be'],
+                correct: 2,
+                explanation: '"Maria and Pedro" equivalem a "They" (Eles), portanto usamos "are".'
+              },
+              {
+                question: 'Como você pergunta em inglês se alguém está pronto?',
+                options: ['You are ready?', 'Are you ready?', 'Is you ready?', 'Am you ready?'],
+                correct: 1,
+                explanation: 'Em perguntas com o verbo To Be, o verbo vem antes do sujeito: "Are you ready?".'
+              },
+              {
+                question: 'Qual é a tradução mais natural para "Nice to meet you"?',
+                options: ['Bom te ver de novo', 'Prazer em conhecer você', 'Até logo', 'Com licença'],
+                correct: 1,
+                explanation: '"Nice to meet you" é a expressão padrão usada quando conhecemos alguém pela primeira vez.'
+              }
+            ]
+          },
+          {
+            id: 'b2',
+            number: 2,
+            title: 'Present Simple & Rotina Diária',
+            duration: '12 min',
+            xp: 60,
+            summary: 'Descreva seus hábitos, horários e ações do dia a dia usando o Present Simple e advérbios de frequência.',
+            grammar: {
+              title: 'Present Simple (Hábitos e Fatos)',
+              intro: 'Usamos o <strong>Present Simple</strong> para falar de rotinas, hábitos e verdades gerais. A regra de ouro está na 3ª pessoa do singular (<strong>He, She, It</strong>).',
+              points: [
+                { rule: 'I / You / We / They + verbo normal', desc: 'Ex: I wake up at 7 AM. We drink coffee.' },
+                { rule: 'He / She / It + verbo com -S / -ES', desc: 'Adicionamos -s ao verbo: She <strong>works</strong>, He <strong>watches</strong> TV, It <strong>goes</strong>.' },
+                { rule: 'Auxiliares DO e DOES', desc: 'Para perguntas e negativas, use <strong>do/don’t</strong> (I, you, we, they) e <strong>does/doesn’t</strong> (he, she, it). O verbo principal volta ao normal!' },
+                { rule: 'Advérbios de Frequência', desc: 'Always (sempre), usually (geralmente), sometimes (às vezes), never (nunca) vêm antes do verbo principal.' }
+              ],
+              examples: [
+                { en: 'I usually wake up at 6:30 in the morning.', pt: 'Eu geralmente acordo às 6:30 da manhã.' },
+                { en: 'He doesn’t drink coffee at night.', pt: 'Ele não bebe café à noite.' },
+                { en: 'Does she study English every day?', pt: 'Ela estuda inglês todos os dias?' }
+              ]
+            },
+            vocabulary: [
+              { en: 'To wake up early', pt: 'Acordar cedo', phonetic: '/tuː weɪk ʌp ˈɜːrli/' },
+              { en: 'To have breakfast', pt: 'Tomar café da manhã', phonetic: '/tuː hæv ˈbrekfəst/' },
+              { en: 'To commute to work', pt: 'Ir para o trabalho (deslocamento)', phonetic: '/tuː kəˈmjuːt tuː wɜːrk/' },
+              { en: 'I always brush my teeth.', pt: 'Eu sempre escovo meus dentes.', phonetic: '/aɪ ˈɔːlweɪz brʌʃ maɪ tiːθ/' },
+              { en: 'She works from home.', pt: 'Ela trabalha de casa (home office).', phonetic: '/ʃiː wɜːrks frɒm hoʊm/' },
+              { en: 'To go to bed at midnight', pt: 'Ir dormir à meia-noite', phonetic: '/tuː ɡoʊ tuː bed æt ˈmɪdnaɪt/' }
+            ],
+            flashcards: [
+              { front: 'To have breakfast', back: 'Tomar café da manhã', hint: 'Em inglês usamos "have" para refeições' },
+              { front: 'She doesn’t work on Sundays', back: 'Ela não trabalha aos domingos', hint: 'Com "doesn’t", o verbo "work" perde o -s' },
+              { front: 'Always / Usually / Never', back: 'Sempre / Geralmente / Nunca', hint: 'Advérbios de frequência' },
+              { front: 'To take a shower', back: 'Tomar banho (de chuveiro)', hint: 'Verbo "take" + shower' },
+              { front: 'Every single day', back: 'Todos os dias (sem exceção)', hint: 'Ênfase em rotina diária' }
+            ],
+            quiz: [
+              {
+                question: 'Escolha a frase gramaticalmente correta:',
+                options: ['He work in a bank.', 'He works in a bank.', 'He working in a bank.', 'He is work in a bank.'],
+                correct: 1,
+                explanation: 'Na afirmativa do Present Simple com "He", o verbo recebe "-s": works.'
+              },
+              {
+                question: 'Complete a pergunta: "_____ your sister live in London?"',
+                options: ['Do', 'Is', 'Does', 'Are'],
+                correct: 2,
+                explanation: '"Your sister" equivale a "She". Para perguntas no Present Simple com She, usamos o auxiliar "Does".'
+              },
+              {
+                question: 'Qual expressão significa "Tomar café da manhã"?',
+                options: ['Eat morning', 'Take coffee', 'Have breakfast', 'Make lunch'],
+                correct: 2,
+                explanation: 'A colocação natural em inglês é "have breakfast" (almoçar = have lunch, jantar = have dinner).'
+              }
+            ]
+          },
+          {
+            id: 'b3',
+            number: 3,
+            title: 'Compras, Preços & Pedindo Direções',
+            duration: '12 min',
+            xp: 60,
+            summary: 'Sobreviva em lojas, restaurantes e ruas: pergunte preços com How much e peça orientações com segurança.',
+            grammar: {
+              title: 'How much vs. How many & Preposições de Lugar',
+              intro: 'Para fazer compras e se localizar na cidade, você precisa saber perguntar quantidades e entender referências espaciais.',
+              points: [
+                { rule: 'How much...? (Quanto custa / Incontáveis)', desc: 'Usado para perguntar preços: <strong>How much is this?</strong> ou coisas incontáveis (água, dinheiro).' },
+                { rule: 'How many...? (Quantos / Contáveis)', desc: 'Usado para itens que podemos contar: <strong>How many tickets</strong> do you need?' },
+                { rule: 'Preposições de Localização', desc: '<strong>Next to</strong> (ao lado de), <strong>across from / opposite</strong> (em frente a), <strong>between</strong> (entre dois pontos), <strong>on the corner</strong> (na esquina).' },
+                { rule: 'Comandos de Direção', desc: '<strong>Go straight ahead</strong> (siga em frente), <strong>turn left</strong> (vire à esquerda), <strong>turn right</strong> (vire à direita).' }
+              ],
+              examples: [
+                { en: 'Excuse me, how much is this blue jacket?', pt: 'Com licença, quanto custa esta jaqueta azul?' },
+                { en: 'The subway station is next to the bank.', pt: 'A estação de metrô fica ao lado do banco.' },
+                { en: 'Go straight ahead and turn left at the traffic light.', pt: 'Siga reto e vire à esquerda no semáforo.' }
+              ]
+            },
+            vocabulary: [
+              { en: 'How much does it cost?', pt: 'Quanto isso custa?', phonetic: '/haʊ mʌtʃ dʌz ɪt kɒst/' },
+              { en: 'Can I pay by credit card?', pt: 'Posso pagar com cartão de crédito?', phonetic: '/kæn aɪ peɪ baɪ ˈkredɪt kɑːrd/' },
+              { en: 'I am just looking, thanks.', pt: 'Estou só olhando, obrigado.', phonetic: '/aɪ æm dʒʌst ˈlʊkɪŋ θæŋks/' },
+              { en: 'Go straight ahead for two blocks.', pt: 'Siga em frente por dois quarteirões.', phonetic: '/ɡoʊ streɪt əˈhed fɔːr tuː blɒks/' },
+              { en: 'Turn right at the corner.', pt: 'Vire à direita na esquina.', phonetic: '/tɜːrn raɪt æt ðə ˈkɔːrnər/' },
+              { en: 'Where is the nearest pharmacy?', pt: 'Onde fica a farmácia mais próxima?', phonetic: '/wer ɪz ðə ˈnɪrɪst ˈfɑːrməsi/' }
+            ],
+            flashcards: [
+              { front: 'Go straight ahead', back: 'Siga em frente / Vá reto', hint: 'Instrução de direção' },
+              { front: 'Next to / Between', back: 'Ao lado de / Entre (dois lugares)', hint: 'Preposições de lugar' },
+              { front: 'How much is it?', back: 'Quanto custa?', hint: 'Pergunta essencial em lojas' },
+              { front: 'Fitting room', back: 'Provador (de roupas)', hint: 'Onde você experimenta roupas na loja' },
+              { front: 'Receipt', back: 'Recibo / Nota fiscal', hint: 'Atenção: o "p" não é pronunciado (/rɪˈsiːt/)' }
+            ],
+            quiz: [
+              {
+                question: 'Você quer saber o preço de um par de tênis. O que você pergunta?',
+                options: ['How many are these shoes?', 'How much are these shoes?', 'What price is they?', 'Where cost these shoes?'],
+                correct: 1,
+                explanation: 'Para preços sempre usamos "How much". Como "shoes" está no plural, usamos "are".'
+              },
+              {
+                question: 'O que significa "Turn left at the corner"?',
+                options: ['Vire à direita no semáforo', 'Siga reto até o fim', 'Vire à esquerda na esquina', 'Atravesse a rua'],
+                correct: 2,
+                explanation: '"Turn left" = vire à esquerda; "at the corner" = na esquina.'
+              },
+              {
+                question: 'Qual preposição indica que a padaria fica "ao lado" do supermercado?',
+                options: ['Between', 'Under', 'Next to', 'Behind'],
+                correct: 2,
+                explanation: '"Next to" significa literalmente "ao lado de".'
+              }
+            ]
+          }
+        ]
+      },
+      intermediate: {
+        id: 'intermediate',
+        title: 'Nível Intermediário',
+        cefr: 'B1 – B2',
+        icon: '🚀',
+        color: 'indigo',
+        description: 'Domine tempos passados e futuros, conecte experiências com o Present Perfect e use Phrasal Verbs como um nativo.',
+        lessons: [
+          {
+            id: 'i1',
+            number: 1,
+            title: 'Past Simple & Past Continuous (Narrando Histórias)',
+            duration: '15 min',
+            xp: 80,
+            summary: 'Aprenda a contar o que aconteceu no passado e a descrever ações em andamento que foram interrompidas.',
+            grammar: {
+              title: 'Past Simple vs. Past Continuous',
+              intro: 'Combinar esses dois tempos verbais permite contar histórias detalhadas e naturais em inglês.',
+              points: [
+                { rule: 'Past Simple (Ação concluída no passado)', desc: 'Verbos regulares ganham <strong>-ed</strong> (worked, traveled). Irregulares mudam de forma (went, saw, bought). Auxiliar: <strong>did / didn’t</strong>.' },
+                { rule: 'Past Continuous (Ação em progresso no passado)', desc: 'Formado por <strong>was / were + verbo-ing</strong>. Ex: I was sleeping (Eu estava dormindo).' },
+                { rule: 'When vs. While (A combinação perfeita)', desc: 'Use <strong>While</strong> (enquanto) para a ação longa em progresso e <strong>When</strong> (quando) para a ação curta que interrompeu.' }
+              ],
+              examples: [
+                { en: 'I was cooking dinner when the phone rang.', pt: 'Eu estava fazendo o jantar quando o telefone tocou.' },
+                { en: 'While they were traveling in Italy, they met an old friend.', pt: 'Enquanto eles estavam viajando pela Itália, encontraram um velho amigo.' },
+                { en: 'She didn’t go to the meeting yesterday.', pt: 'Ela não foi à reunião ontem.' }
+              ]
+            },
+            vocabulary: [
+              { en: 'Suddenly, the lights went out.', pt: 'De repente, as luzes se apagaram.', phonetic: '/ˈsʌdənli ðə laɪts went aʊt/' },
+              { en: 'I missed my flight yesterday.', pt: 'Eu perdi meu voo ontem.', phonetic: '/aɪ mɪst maɪ flaɪt ˈjestərdeɪ/' },
+              { en: 'While I was working, it started to rain.', pt: 'Enquanto eu estava trabalhando, começou a chover.', phonetic: '/waɪl aɪ wəz ˈwɜːrkɪŋ ɪt ˈstɑːrtɪd tuː reɪn/' },
+              { en: 'We booked a hotel downtown.', pt: 'Nós reservamos um hotel no centro.', phonetic: '/wiː bʊkt ə hoʊˈtel ˌdaʊnˈtaʊn/' },
+              { en: 'What were you doing at 8 PM?', pt: 'O que você estava fazendo às 20h?', phonetic: '/wɒt wɜːr juː ˈduːɪŋ æt eɪt piː em/' }
+            ],
+            flashcards: [
+              { front: 'To miss a flight / bus', back: 'Perder um voo / ônibus', hint: 'Não use "lose" para transportes, use "miss"' },
+              { front: 'While vs. When', back: 'Enquanto (ação longa) vs. Quando (ação curta)', hint: 'Conectivos temporais' },
+              { front: 'Go → Went / See → Saw / Buy → Bought', back: 'Ir → Foi / Ver → Viu / Comprar → Comprou', hint: 'Verbos irregulares no Past Simple' },
+              { front: 'To book a room', back: 'Reservar um quarto', hint: '"Book" como verbo significa reservar' }
+            ],
+            quiz: [
+              {
+                question: 'Complete: "I _____ TV when my friend arrived."',
+                options: ['watched', 'was watching', 'were watching', 'am watching'],
+                correct: 1,
+                explanation: 'A ação de assistir TV estava em andamento no passado quando foi interrompida ("was watching").'
+              },
+              {
+                question: 'Qual é a forma negativa correta de "She went to Paris"?',
+                options: ['She didn’t went to Paris.', 'She not went to Paris.', 'She didn’t go to Paris.', 'She wasn’t go to Paris.'],
+                correct: 2,
+                explanation: 'Quando usamos o auxiliar "didn’t", o verbo principal volta para sua forma base ("go").'
+              },
+              {
+                question: 'Como dizer "Eu perdi o ônibus" em inglês?',
+                options: ['I lost the bus.', 'I missed the bus.', 'I forgot the bus.', 'I dropped the bus.'],
+                correct: 1,
+                explanation: 'Para meios de transporte ou compromissos, o verbo correto é "miss".'
+              }
+            ]
+          },
+          {
+            id: 'i2',
+            number: 2,
+            title: 'Present Perfect & Future Forms (Will vs. Going to)',
+            duration: '15 min',
+            xp: 85,
+            summary: 'Conecte o passado ao presente com o Present Perfect e escolha corretamente entre Will e Going to para falar do futuro.',
+            grammar: {
+              title: 'Experiências de Vida & Decisões Futuras',
+              intro: 'Dois dos tópicos mais importantes do nível intermediário são diferenciar tempo indefinido (Present Perfect) de tempo definido, além de expressar planos futuros.',
+              points: [
+                { rule: 'Present Perfect (Have / Has + Particípio)', desc: 'Usado para experiências de vida (sem dizer quando) ou ações que começaram no passado e continuam agora. Ex: <strong>I have lived here for 5 years.</strong>' },
+                { rule: 'Already, Yet, Just, Ever, Never', desc: 'Palavras-chave do Present Perfect: <strong>Have you ever</strong> been to Japan? / I have <strong>already</strong> finished.' },
+                { rule: 'Going to (Planos e Evidências)', desc: 'Use para planos já decididos antes da fala ou previsões com evidência visual: <strong>Look at those dark clouds! It’s going to rain.</strong>' },
+                { rule: 'Will (Decisões espontâneas e Promessas)', desc: 'Decidido na hora da fala: <strong>"The phone is ringing." — "I’ll get it!"</strong>' }
+              ],
+              examples: [
+                { en: 'Have you ever tried sushi?', pt: 'Você já experimentou sushi alguma vez na vida?' },
+                { en: 'I have worked at this company since 2022.', pt: 'Eu trabalho nesta empresa desde 2022.' },
+                { en: 'We are going to launch the new product next month.', pt: 'Nós vamos lançar o novo produto no mês que vem.' }
+              ]
+            },
+            vocabulary: [
+              { en: 'Have you ever been abroad?', pt: 'Você já esteve no exterior?', phonetic: '/hæv juː ˈevər bɪn əˈbrɔːd/' },
+              { en: 'I haven’t finished the report yet.', pt: 'Eu ainda não terminei o relatório.', phonetic: '/aɪ ˈhævənt ˈfɪnɪʃt ðə rɪˈpɔːrt jet/' },
+              { en: 'I’ll send you the file right away.', pt: 'Eu te envio o arquivo imediatamente.', phonetic: '/aɪl send juː ðə faɪl raɪt əˈweɪ/' },
+              { en: 'She is going to apply for the job.', pt: 'Ela vai se candidatar para a vaga.', phonetic: '/ʃiː ɪz ˈɡoʊɪŋ tuː əˈplaɪ fɔːr ðə dʒɒb/' },
+              { en: 'For three years / Since Monday', pt: 'Por três anos / Desde segunda-feira', phonetic: '/fɔːr θriː jɪrz sɪns ˈmʌndeɪ/' }
+            ],
+            flashcards: [
+              { front: 'Since vs. For', back: 'Desde (ponto inicial) vs. Por (duração)', hint: 'Since 2020 / For 4 years' },
+              { front: 'I haven’t decided yet', back: 'Eu ainda não decidi', hint: '"Yet" vai no final de frases negativas/perguntas' },
+              { front: 'I’ll help you with that!', back: 'Eu te ajudo com isso!', hint: 'Oferta espontânea → usa-se "Will"' },
+              { front: 'Abroad', back: 'No exterior / Fora do país', hint: 'To study abroad / To travel abroad' }
+            ],
+            quiz: [
+              {
+                question: 'Complete: "She _____ in London since 2019."',
+                options: ['lives', 'lived', 'has lived', 'is living'],
+                correct: 2,
+                explanation: 'Ação que começou no passado (2019) e continua até hoje exige o Present Perfect ("has lived").'
+              },
+              {
+                question: 'Alguém bate à porta e você decide na hora atender. O que você diz?',
+                options: ['I am going to open it.', 'I will open it.', 'I opened it.', 'I have opened it.'],
+                correct: 1,
+                explanation: 'Decisões tomadas espontaneamente no momento da fala usam "will" ("I’ll open it").'
+              },
+              {
+                question: 'Qual palavra completa: "Have you _____ seen a shooting star?"',
+                options: ['yet', 'since', 'ever', 'for'],
+                correct: 2,
+                explanation: '"Ever" é usado em perguntas no Present Perfect com o sentido de "alguma vez na vida".'
+              }
+            ]
+          },
+          {
+            id: 'i3',
+            number: 3,
+            title: 'Phrasal Verbs Essenciais no Trabalho & Dia a Dia',
+            duration: '14 min',
+            xp: 90,
+            summary: 'Desbloqueie a compreensão real do inglês falado dominando combinações de verbos + preposições indispensáveis.',
+            grammar: {
+              title: 'Como Funcionam os Phrasal Verbs',
+              intro: 'Um <strong>Phrasal Verb</strong> é a união de um verbo com uma preposição ou advérbio que cria um significado totalmente novo.',
+              points: [
+                { rule: 'Separáveis vs. Inseparáveis', desc: 'Alguns permitem colocar o objeto no meio: <strong>Turn the lights off</strong> ou <strong>Turn off the lights</strong>. Se usar pronome (it/them), vai sempre no meio: <strong>Turn it off</strong>.' },
+                { rule: 'Contexto Profissional', desc: '<strong>Call off</strong> (cancelar), <strong>put off</strong> (adiar), <strong>figure out</strong> (descobrir/resolver), <strong>bring up</strong> (mencionar um assunto).' },
+                { rule: 'Contexto Cotidiano', desc: '<strong>Give up</strong> (desistir), <strong>run out of</strong> (ficar sem estoque/acabar), <strong>look forward to</strong> (aguardar ansiosamente).' }
+              ],
+              examples: [
+                { en: 'They had to call off the meeting due to bad weather.', pt: 'Eles tiveram que cancelar a reunião devido ao mau tempo.' },
+                { en: 'We need to figure out a solution quickly.', pt: 'Precisamos encontrar/resolver uma solução rapidamente.' },
+                { en: 'I’m looking forward to hearing from you.', pt: 'Aguardo ansiosamente seu retorno.' }
+              ]
+            },
+            vocabulary: [
+              { en: 'Never give up on your goals.', pt: 'Nunca desista dos seus objetivos.', phonetic: '/ˈnevər ɡɪv ʌp ɒn jɔːr ɡoʊlz/' },
+              { en: 'We ran out of coffee in the office.', pt: 'Ficamos sem café no escritório.', phonetic: '/wiː ræn aʊt əv ˈkɒfi ɪn ði ˈɒfɪs/' },
+              { en: 'Let’s put off the presentation until Friday.', pt: 'Vamos adiar a apresentação para sexta-feira.', phonetic: '/lets pʊt ɒf ðə ˌprezənˈteɪʃən ənˈtɪl ˈfraɪdeɪ/' },
+              { en: 'Can you look into this issue?', pt: 'Você pode investigar/analisar esse problema?', phonetic: '/kæn juː lʊk ˈɪntuː ðɪs ˈɪʃuː/' },
+              { en: 'I get along well with my coworkers.', pt: 'Eu me dou bem com meus colegas de trabalho.', phonetic: '/aɪ ɡet əˈlɒŋ wel wɪð maɪ ˈkoʊwɜːrkərz/' }
+            ],
+            flashcards: [
+              { front: 'Call off vs. Put off', back: 'Cancelar vs. Adiar', hint: 'Dois phrasal verbs cruciais em reuniões' },
+              { front: 'Figure out', back: 'Descobrir, entender ou resolver algo', hint: 'Ex: "I finally figured it out!"' },
+              { front: 'Run out of', back: 'Ficar sem / Acabar o estoque de algo', hint: 'Ex: "My phone ran out of battery"' },
+              { front: 'Look forward to + verbo-ING', back: 'Aguardar ansiosamente por algo', hint: 'Atenção: após "to", usa-se -ing (seeing, hearing)' }
+            ],
+            quiz: [
+              {
+                question: 'O gerente decidiu adiar a reunião para amanhã. Qual phrasal verb substitui "postpone"?',
+                options: ['Call off', 'Put off', 'Give up', 'Run out of'],
+                correct: 1,
+                explanation: '"Put off" significa adiar (postpone). "Call off" significa cancelar definitivamente.'
+              },
+              {
+                question: 'Complete: "We need to _____ how to fix this bug."',
+                options: ['give up', 'figure out', 'get along', 'turn off'],
+                correct: 1,
+                explanation: '"Figure out" significa descobrir como resolver ou compreender um problema.'
+              },
+              {
+                question: 'Qual frase está correta ao encerrar um e-mail profissional?',
+                options: ['I look forward to hear from you.', 'I look forward to hearing from you.', 'I look forward hear you.', 'I looking forward to hear.'],
+                correct: 1,
+                explanation: 'Na expressão "look forward to", o "to" é uma preposição, exigindo o gerúndio ("hearing").'
+              }
+            ]
+          }
+        ]
+      },
+      advanced: {
+        id: 'advanced',
+        title: 'Nível Avançado',
+        cefr: 'C1 – C2',
+        icon: '👑',
+        color: 'violet',
+        description: 'Alcance precisão executiva e sofisticação: Conditionals complexas, Voz Passiva, Reported Speech e Idioms nativos.',
+        lessons: [
+          {
+            id: 'a1',
+            number: 1,
+            title: 'Second, Third & Mixed Conditionals',
+            duration: '18 min',
+            xp: 110,
+            summary: 'Expresse hipóteses improváveis, arrependimentos do passado e consequências no presente com domínio total das estruturas condicionais.',
+            grammar: {
+              title: 'Estruturas Hipotéticas Avançadas',
+              intro: 'Para argumentar em alto nível, você precisa navegar entre situações irreais no presente e cenários alternativos do passado.',
+              points: [
+                { rule: 'Second Conditional (Hipótese no Presente)', desc: '<strong>If + Past Simple, ... would + verbo base</strong>. Ex: If I <strong>knew</strong> the answer, I <strong>would tell</strong> you. (Usa-se "were" para todos os sujeitos em tom formal: If I were you...).' },
+                { rule: 'Third Conditional (Passado Imaginário / Arrependimento)', desc: '<strong>If + Past Perfect (had + particípio), ... would have + particípio</strong>. Ex: If we <strong>had left</strong> earlier, we <strong>wouldn’t have missed</strong> the train.' },
+                { rule: 'Mixed Conditional (Passado → Presente)', desc: 'Uma condição irreal no passado com resultado no presente: <strong>If I had taken</strong> that job, I <strong>would be</strong> living in Tokyo now.' }
+              ],
+              examples: [
+                { en: 'If I were in your shoes, I would negotiate a higher salary.', pt: 'Se eu estivesse no seu lugar, negociaria um salário maior.' },
+                { en: 'Had I known about the traffic, I would have taken the subway.', pt: 'Se eu soubesse do trânsito, teria pegado o metrô. (Inversão formal)' },
+                { en: 'If she hadn’t studied medicine, she wouldn’t be a surgeon today.', pt: 'Se ela não tivesse estudado medicina, não seria cirurgiã hoje.' }
+              ]
+            },
+            vocabulary: [
+              { en: 'If I were in your shoes...', pt: 'Se eu estivesse no seu lugar...', phonetic: '/ɪf aɪ wɜːr ɪn jɔːr ʃuːz/' },
+              { en: 'In hindsight, we should have acted faster.', pt: 'Olhando em retrospecto, deveríamos ter agido mais rápido.', phonetic: '/ɪn ˈhaɪndsaɪt wiː ʃʊd hæv ˈæktɪd ˈfæstər/' },
+              { en: 'Had we known earlier, we would have intervened.', pt: 'Tivéssemos sabido antes, teríamos intervindo.', phonetic: '/hæd wiː noʊn ˈɜːrliər wiː wʊd hæv ˌɪntərˈviːnd/' },
+              { en: 'Against all odds, the project succeeded.', pt: 'Contra todas as probabilidades, o projeto teve sucesso.', phonetic: '/əˈɡenst ɔːl ɒdz ðə ˈprɒdʒekt səkˈsiːdɪd/' },
+              { en: 'It goes without saying that quality matters.', pt: 'Nem é preciso dizer que qualidade importa.', phonetic: '/ɪt ɡoʊz wɪˈðaʊt ˈseɪɪŋ ðæt ˈkwɒləti ˈmætərz/' }
+            ],
+            flashcards: [
+              { front: 'In hindsight', back: 'Olhando em retrospecto / Com a visão de hoje', hint: 'Muito usado ao analisar erros passados' },
+              { front: 'If I were in your shoes', back: 'Se eu estivesse na sua pele / no seu lugar', hint: 'Second Conditional idiomática' },
+              { front: 'Had I known... (= If I had known...)', back: 'Se eu soubesse / Tivesse eu sabido...', hint: 'Inversão condicional de nível C1/C2' },
+              { front: 'Against all odds', back: 'Contra todas as probabilidades / Contra tudo e todos', hint: 'Expressão enfática avançada' }
+            ],
+            quiz: [
+              {
+                question: 'Complete a Third Conditional: "If they _____ harder, they would have won the championship."',
+                options: ['trained', 'had trained', 'have trained', 'would train'],
+                correct: 1,
+                explanation: 'A Third Conditional exige Past Perfect ("had + particípio") na cláusula com "If".'
+              },
+              {
+                question: 'Identifique a Mixed Conditional (condição passada com consequência presente):',
+                options: [
+                  'If I win the lottery, I will buy a yacht.',
+                  'If I had invested in that company, I would be rich today.',
+                  'If I were you, I would accept the offer.',
+                  'If it rains, the grass gets wet.'
+                ],
+                correct: 1,
+                explanation: 'A condição ocorreu no passado ("had invested"), mas o resultado afeta o presente ("would be rich today").'
+              },
+              {
+                question: 'O que significa a expressão "In hindsight"?',
+                options: ['À primeira vista', 'Olhando em retrospecto (depois que aconteceu)', 'Sem sombra de dúvidas', 'Por outro lado'],
+                correct: 1,
+                explanation: '"Hindsight" refere-se à compreensão de uma situação somente depois que ela já ocorreu.'
+              }
+            ]
+          },
+          {
+            id: 'a2',
+            number: 2,
+            title: 'Passive Voice & Reported Speech (Comunicação Formal)',
+            duration: '16 min',
+            xp: 115,
+            summary: 'Domine a impessoalidade elegante da Voz Passiva e relate discursos e reuniões com precisão gramatical.',
+            grammar: {
+              title: 'Voz Passiva Avançada & Discurso Indireto',
+              intro: 'Em relatórios corporativos, artigos acadêmicos e jornalismo, o foco recai sobre a ação, não sobre quem a praticou.',
+              points: [
+                { rule: 'Passive Voice (To Be + Past Participle)', desc: 'O verbo To Be assume o tempo verbal da frase original: <strong>The contract is being reviewed</strong> (está sendo revisado) / <strong>The deal was signed</strong> (foi assinado).' },
+                { rule: 'Passive com Modais', desc: '<strong>Modal + be + particípio</strong>: This issue <strong>must be addressed</strong> immediately.' },
+                { rule: 'Reported Speech (Backshift)', desc: 'Ao relatar o que alguém disse, recuamos um tempo verbal: "I <strong>am</strong> busy" → He said he <strong>was</strong> busy. "We <strong>will</strong> deliver" → They promised they <strong>would</strong> deliver.' }
+              ],
+              examples: [
+                { en: 'The new cybersecurity protocol is being implemented globally.', pt: 'O novo protocolo de cibersegurança está sendo implementado globalmente.' },
+                { en: 'The CEO stated that the company had exceeded all targets.', pt: 'O CEO declarou que a empresa havia superado todas as metas.' },
+                { en: 'It is widely believed that AI will reshape the workforce.', pt: 'Acredita-se amplamente que a IA remodelará a força de trabalho.' }
+              ]
+            },
+            vocabulary: [
+              { en: 'The matter is currently being investigated.', pt: 'O assunto está sendo investigado no momento.', phonetic: '/ðə ˈmætər ɪz ˈkɜːrəntli ˈbiːɪŋ ɪnˈvestɪɡeɪtɪd/' },
+              { en: 'She claimed that she hadn’t received the memo.', pt: 'Ela alegou que não havia recebido o memorando.', phonetic: '/ʃiː kleɪmd ðæt ʃiː ˈhædənt rɪˈsiːvd ðə ˈmemoʊ/' },
+              { en: 'Measures must be taken to mitigate risks.', pt: 'Medidas devem ser tomadas para mitigar riscos.', phonetic: '/ˈmeʒərz mʌst biː ˈteɪkən tuː ˈmɪtɪɡeɪt rɪsks/' },
+              { en: 'It is alleged that the data was leaked.', pt: 'Alega-se que os dados foram vazados.', phonetic: '/ɪt ɪz əˈledʒd ðæt ðə ˈdeɪtə wəz liːkt/' },
+              { en: 'He urged the team to meet the deadline.', pt: 'Ele instou a equipe a cumprir o prazo.', phonetic: '/hiː ɜːrdʒd ðə tiːm tuː miːt ðə ˈdedlaɪn/' }
+            ],
+            flashcards: [
+              { front: 'To mitigate risks', back: 'Mitigar / Reduzir riscos', hint: 'Vocabulário executivo C1' },
+              { front: 'Is being reviewed', back: 'Está sendo revisado(a)', hint: 'Present Continuous na Voz Passiva' },
+              { front: 'It is widely believed that...', back: 'Acredita-se amplamente que...', hint: 'Estrutura impessoal sofisticada para redações e discursos' },
+              { front: 'To meet a deadline', back: 'Cumprir um prazo', hint: 'Oposto: "to miss a deadline"' }
+            ],
+            quiz: [
+              {
+                question: 'Passe para a Voz Passiva: "Engineers are testing the new engine."',
+                options: [
+                  'The new engine is tested by engineers.',
+                  'The new engine is being tested by engineers.',
+                  'The new engine was being tested by engineers.',
+                  'The new engine has been tested.'
+                ],
+                correct: 1,
+                explanation: 'Como a frase original está no Present Continuous ("are testing"), a passiva exige "is being tested".'
+              },
+              {
+                question: 'Transforme em Reported Speech: Sarah said: "I will call you tomorrow."',
+                options: [
+                  'Sarah said she will call me tomorrow.',
+                  'Sarah said she would call me the next day.',
+                  'Sarah said she calls me the next day.',
+                  'Sarah said she had called me.'
+                ],
+                correct: 1,
+                explanation: 'No Reported Speech, "will" recua para "would" e "tomorrow" torna-se "the next day".'
+              },
+              {
+                question: 'Qual opção completa formalmente: "Strict rules must _____ to ensure safety."',
+                options: ['enforce', 'be enforced', 'been enforced', 'enforcing'],
+                correct: 1,
+                explanation: 'Após verbo modal ("must") na voz passiva, usa-se "be + particípio" ("be enforced").'
+              }
+            ]
+          },
+          {
+            id: 'a3',
+            number: 3,
+            title: 'Idioms Corporativos, Slang Nativo & Argumentação',
+            duration: '16 min',
+            xp: 120,
+            summary: 'Fale com naturalidade e persuasão usando expressões idiomáticas do mundo corporativo e conectivos de alto nível.',
+            grammar: {
+              title: 'Conectivos de Contraste e Nuance (C1/C2)',
+              intro: 'A diferença entre um falante intermediário e um avançado está na habilidade de estruturar argumentos complexos sem repetir "but" ou "so" o tempo todo.',
+              points: [
+                { rule: 'Nevertheless / Nonetheless (Contudo / Ainda assim)', desc: 'Introduz um contraste forte de forma elegante. Ex: The market is volatile; <strong>nevertheless</strong>, we remain profitable.' },
+                { rule: 'Albeit (Embora / Mesmo que)', desc: 'Usado antes de adjetivos ou frases reduzidas: It was a slow, <strong>albeit</strong> steady, recovery.' },
+                { rule: 'Idioms de Negócios e Cotidiano', desc: '<strong>Cut corners</strong> (economizar cortando qualidade), <strong>get the ball rolling</strong> (dar o pontapé inicial), <strong>on the same page</strong> (em sintonia/acordo).' }
+              ],
+              examples: [
+                { en: 'Let’s touch base next week to make sure everyone is on the same page.', pt: 'Vamos conversar rapidamente semana que vem para garantir que todos estejam na mesma sintonia.' },
+                { en: 'Cutting corners on security will eventually backfire.', pt: 'Economizar comprometendo a segurança acabará saindo pela culatra.' },
+                { en: 'The proposal is ambitious, albeit feasible.', pt: 'A proposta é ambiciosa, embora viável.' }
+              ]
+            },
+            vocabulary: [
+              { en: 'Let’s get the ball rolling.', pt: 'Vamos dar o pontapé inicial / começar.', phonetic: '/lets ɡet ðə bɔːl ˈroʊlɪŋ/' },
+              { en: 'We need to think outside the box.', pt: 'Precisamos pensar fora da caixa (de forma criativa).', phonetic: '/wiː niːd tuː θɪŋk ˌaʊtˈsaɪd ðə bɒks/' },
+              { en: 'Let’s touch base on Friday.', pt: 'Vamos fazer um contato rápido na sexta.', phonetic: '/lets tʌtʃ beɪs ɒn ˈfraɪdeɪ/' },
+              { en: 'That’s a double-edged sword.', pt: 'Isso é uma faca de dois gumes.', phonetic: '/ðæts ə ˌdʌbəl ˈedʒd sɔːrd/' },
+              { en: 'To wrap things up, let’s review our action items.', pt: 'Para encerrar/resumir, vamos revisar nossos itens de ação.', phonetic: '/tuː ræp θɪŋz ʌp lets rɪˈvjuː ˈaʊər ˈækʃən ˈaɪtəmz/' }
+            ],
+            flashcards: [
+              { front: 'To cut corners', back: 'Fazer algo de qualquer jeito para economizar tempo/dinheiro', hint: 'Tem conotação negativa de perda de qualidade' },
+              { front: 'To touch base', back: 'Entrar em contato rápido para alinhar algo', hint: 'Idiom muito comum em empresas americanas' },
+              { front: 'A double-edged sword', back: 'Uma faca de dois gumes (algo com prós e contras)', hint: 'Expressão metafórica' },
+              { front: 'Albeit', back: 'Embora / Apesar de (formal)', hint: 'Ex: "A small, albeit important, detail"' }
+            ],
+            quiz: [
+              {
+                question: 'Se uma equipe está "cutting corners" no desenvolvimento de um produto, o que ela está fazendo?',
+                options: [
+                  'Trabalhando horas extras para entregar antes',
+                  'Pulando etapas importantes e reduzindo qualidade para economizar',
+                  'Inovando com tecnologia de ponta',
+                  'Cancelando o projeto'
+                ],
+                correct: 1,
+                explanation: '"Cut corners" significa pegar atalhos que comprometem a qualidade ou segurança.'
+              },
+              {
+                question: 'Qual expressão significa "dar o pontapé inicial" em uma reunião ou projeto?',
+                options: ['Bite the bullet', 'Get the ball rolling', 'Hit the sack', 'Spill the beans'],
+                correct: 1,
+                explanation: '"Get the ball rolling" significa iniciar uma atividade ou processo.'
+              },
+              {
+                question: 'Complete com o conectivo avançado adequado: "The strategy is risky; _____, it offers the highest return."',
+                options: ['albeit', 'nevertheless', 'despite', 'whereas'],
+                correct: 1,
+                explanation: '"Nevertheless" (contudo / ainda assim) conecta duas orações completas expressando contraste.'
+              }
+            ]
+          }
+        ]
+      }
+    };
+
+    /**
+     * LISTA DE MEDALHAS / CONQUISTAS DO SISTEMA
+     */
+    const BADGES_CATALOG = [
+      { id: 'first_step', icon: '🎯', title: 'Primeiro Passo', desc: 'Concluiu sua primeira lição no FluentPath.' },
+      { id: 'audio_learner', icon: '🎧', title: 'Ouvido Afiado', desc: 'Praticou a pronúncia nativa com o sintetizador de voz.' },
+      { id: 'basic_master', icon: '🌱', title: 'Mestre do Básico (A1-A2)', desc: 'Completou 100% das lições do nível Básico.' },
+      { id: 'inter_master', icon: '🚀', title: 'Explorador Intermediário (B1-B2)', desc: 'Completou 100% das lições do nível Intermediário.' },
+      { id: 'adv_master', icon: '👑', title: 'Fluência Executiva (C1-C2)', desc: 'Completou 100% das lições do nível Avançado.' },
+      { id: 'xp_500', icon: '⚡', title: 'Acumulador de XP', desc: 'Alcançou 300 ou mais pontos de experiência (XP).' }
+    ];
+
+    /**
+     * CONTROLADOR PRINCIPAL DA APLICAÇÃO
+     */
+    const app = {
+      state: {
+        currentLevel: 'basic',     // 'basic' | 'intermediate' | 'advanced'
+        view: 'dashboard',         // 'dashboard' | 'lesson'
+        activeLessonId: null,
+        activeTab: 'grammar',      // 'grammar' | 'vocab' | 'flashcards' | 'quiz'
+        completedLessons: [],      // array de IDs ex: ['b1', 'b2']
+        xp: 0,
+        streak: 1,
+        lastStudyDate: null,
+        unlockedBadges: [],
+        usedAudio: false,
+        darkMode: false,
+        // Estado temporário da lição atual
+        flashcardIndex: 0,
+        flashcardFlipped: false,
+        quizAnswers: {},           // { questionIndex: selectedOptionIndex }
+        quizSubmitted: false
+      },
+
+      init() {
+        this.loadState();
+        this.applyTheme();
+        this.checkStreak();
+        this.render();
+      },
+
+      // Carrega progresso do localStorage com segurança
+      loadState() {
+        try {
+          const saved = localStorage.getItem('fluentpath_progress_v1');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            this.state = { ...this.state, ...parsed, view: 'dashboard', activeLessonId: null };
+          } else {
+            // Detecta preferência de tema do sistema na primeira visita
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+              this.state.darkMode = true;
+            }
+          }
+        } catch (e) {
+          console.error('Erro ao carregar progresso:', e);
+        }
+      },
+
+      // Salva progresso no localStorage
+      saveState() {
+        try {
+          const toSave = {
+            currentLevel: this.state.currentLevel,
+            completedLessons: this.state.completedLessons,
+            xp: this.state.xp,
+            streak: this.state.streak,
+            lastStudyDate: this.state.lastStudyDate,
+            unlockedBadges: this.state.unlockedBadges,
+            usedAudio: this.state.usedAudio,
+            darkMode: this.state.darkMode
+          };
+          localStorage.setItem('fluentpath_progress_v1', JSON.stringify(toSave));
+        } catch (e) {
+          console.error('Erro ao salvar progresso:', e);
+        }
+      },
+
+      // Gerencia ofensiva (streak) diária
+      checkStreak() {
+        const today = new Date().toISOString().split('T')[0];
+        if (!this.state.lastStudyDate) {
+          this.state.lastStudyDate = today;
+          this.state.streak = 1;
+          this.saveState();
+          return;
+        }
+        if (this.state.lastStudyDate !== today) {
+          const last = new Date(this.state.lastStudyDate);
+          const now = new Date(today);
+          const diffDays = Math.round((now - last) / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) {
+            this.state.streak += 1;
+          } else if (diffDays > 1) {
+            this.state.streak = 1;
+          }
+          this.state.lastStudyDate = today;
+          this.saveState();
+        }
+      },
+
+      applyTheme() {
+        const html = document.documentElement;
+        const icon = document.getElementById('theme-icon');
+        if (this.state.darkMode) {
+          html.classList.add('dark');
+          if (icon) icon.textContent = '☀️';
+        } else {
+          html.classList.remove('dark');
+          if (icon) icon.textContent = '🌙';
+        }
+      },
+
+      toggleDarkMode() {
+        this.state.darkMode = !this.state.darkMode;
+        this.applyTheme();
+        this.saveState();
+      },
+
+      // Síntese de Voz Nativa (Web Speech API - en-US)
+      speak(text, rate = 1.0) {
+        if (!('speechSynthesis' in window)) {
+          this.showToast('Seu navegador não suporta síntese de voz.', 'warning');
+          return;
+        }
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = rate; // 1.0 = normal, 0.65 = devagar
+
+        // Tenta escolher uma voz nativa en-US de alta qualidade
+        const voices = window.speechSynthesis.getVoices();
+        const enVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Natural')))
+                     || voices.find(v => v.lang.startsWith('en-'));
+        if (enVoice) utterance.voice = enVoice;
+
+        window.speechSynthesis.speak(utterance);
+
+        if (!this.state.usedAudio) {
+          this.state.usedAudio = true;
+          this.evaluateBadges();
+          this.saveState();
+        }
+      },
+
+      // Navegação e Seleção de Nível
+      selectLevel(levelKey) {
+        this.state.currentLevel = levelKey;
+        this.state.view = 'dashboard';
+        this.state.activeLessonId = null;
+        this.saveState();
+        this.render();
+      },
+
+      goHome() {
+        this.state.view = 'dashboard';
+        this.state.activeLessonId = null;
+        this.render();
+      },
+
+      openLesson(lessonId) {
+        this.state.view = 'lesson';
+        this.state.activeLessonId = lessonId;
+        this.state.activeTab = 'grammar';
+        this.state.flashcardIndex = 0;
+        this.state.flashcardFlipped = false;
+        this.state.quizAnswers = {};
+        this.state.quizSubmitted = false;
+        this.render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+
+      setLessonTab(tabName) {
+        this.state.activeTab = tabName;
+        this.render();
+      },
+
+      // Controles dos Flashcards
+      flipFlashcard() {
+        this.state.flashcardFlipped = !this.state.flashcardFlipped;
+        this.render();
+      },
+
+      nextFlashcard(total) {
+        this.state.flashcardFlipped = false;
+        this.state.flashcardIndex = (this.state.flashcardIndex + 1) % total;
+        this.render();
+      },
+
+      prevFlashcard(total) {
+        this.state.flashcardFlipped = false;
+        this.state.flashcardIndex = (this.state.flashcardIndex - 1 + total) % total;
+        this.render();
+      },
+
+      // Controles do Quiz
+      selectQuizOption(qIdx, optIdx) {
+        if (this.state.quizSubmitted) return;
+        this.state.quizAnswers[qIdx] = optIdx;
+        this.render();
+      },
+
+      submitQuiz() {
+        const lesson = this.getActiveLesson();
+        if (!lesson) return;
+        const totalQ = lesson.quiz.length;
+        if (Object.keys(this.state.quizAnswers).length < totalQ) {
+          this.showToast('Responda todas as perguntas antes de finalizar o quiz!', 'warning');
+          return;
+        }
+        this.state.quizSubmitted = true;
+
+        let correctCount = 0;
+        lesson.quiz.forEach((q, idx) => {
+          if (this.state.quizAnswers[idx] === q.correct) correctCount++;
+        });
+
+        const passed = correctCount >= Math.ceil(totalQ * 0.6); // Mínimo 60% de acerto
+        if (passed) {
+          const alreadyCompleted = this.state.completedLessons.includes(lesson.id);
+          if (!alreadyCompleted) {
+            this.state.completedLessons.push(lesson.id);
+            this.state.xp += lesson.xp;
+            this.showToast(`Parabéns! Lição concluída (+${lesson.xp} XP) 🎉`, 'success');
+          } else {
+            this.showToast(`Excelente revisão! Você acertou ${correctCount} de ${totalQ}.`, 'success');
+          }
+          this.evaluateBadges();
+          this.saveState();
+        } else {
+          this.showToast(`Você acertou ${correctCount} de ${totalQ}. Revise o guia e tente novamente!`, 'error');
+        }
+        this.render();
+      },
+
+      retryQuiz() {
+        this.state.quizAnswers = {};
+        this.state.quizSubmitted = false;
+        this.render();
+      },
+
+      // Avalia e desbloqueia medalhas
+      evaluateBadges() {
+        const newlyUnlocked = [];
+        const unlock = (id) => {
+          if (!this.state.unlockedBadges.includes(id)) {
+            this.state.unlockedBadges.push(id);
+            const badge = BADGES_CATALOG.find(b => b.id === id);
+            if (badge) newlyUnlocked.push(badge);
+          }
+        };
+
+        if (this.state.completedLessons.length >= 1) unlock('first_step');
+        if (this.state.usedAudio) unlock('audio_learner');
+        if (this.state.xp >= 300) unlock('xp_500');
+
+        const basicIds = COURSE_DATA.basic.lessons.map(l => l.id);
+        if (basicIds.every(id => this.state.completedLessons.includes(id))) unlock('basic_master');
+
+        const interIds = COURSE_DATA.intermediate.lessons.map(l => l.id);
+        if (interIds.every(id => this.state.completedLessons.includes(id))) unlock('inter_master');
+
+        const advIds = COURSE_DATA.advanced.lessons.map(l => l.id);
+        if (advIds.every(id => this.state.completedLessons.includes(id))) unlock('adv_master');
+
+        newlyUnlocked.forEach(b => {
+          this.showToast(`Nova Medalha Desbloqueada: ${b.icon} ${b.title}!`, 'badge');
+        });
+      },
+
+      // Cálculos de Progresso
+      getProgressStats() {
+        const allLessons = [
+          ...COURSE_DATA.basic.lessons,
+          ...COURSE_DATA.intermediate.lessons,
+          ...COURSE_DATA.advanced.lessons
+        ];
+        const totalCompleted = this.state.completedLessons.length;
+        const overallPercent = Math.round((totalCompleted / allLessons.length) * 100);
+
+        const levelStats = {};
+        ['basic', 'intermediate', 'advanced'].forEach(lvl => {
+          const lessons = COURSE_DATA[lvl].lessons;
+          const done = lessons.filter(l => this.state.completedLessons.includes(l.id)).length;
+          levelStats[lvl] = {
+            done,
+            total: lessons.length,
+            percent: Math.round((done / lessons.length) * 100)
+          };
+        });
+
+        return { overallPercent, totalCompleted, totalLessons: allLessons.length, levelStats };
+      },
+
+      getActiveLesson() {
+        for (const lvl of ['basic', 'intermediate', 'advanced']) {
+          const found = COURSE_DATA[lvl].lessons.find(l => l.id === this.state.activeLessonId);
+          if (found) return found;
+        }
+        return null;
+      },
+
+      // Modal de Conquistas
+      toggleBadgesModal(show) {
+        const modal = document.getElementById('badges-modal');
+        if (!modal) return;
+        if (show) {
+          this.renderBadgesGrid();
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      },
+
+      renderBadgesGrid() {
+        const grid = document.getElementById('badges-grid');
+        if (!grid) return;
+        grid.innerHTML = BADGES_CATALOG.map(b => {
+          const unlocked = this.state.unlockedBadges.includes(b.id);
+          return `
+            <div class="p-3.5 rounded-2xl border ${unlocked
+              ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700/60'
+              : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 opacity-60'} flex items-start gap-3">
+              <div class="text-2xl ${unlocked ? '' : 'grayscale'}">${b.icon}</div>
+              <div>
+                <div class="font-bold text-sm flex items-center gap-1.5">
+                  <span>${b.title}</span>
+                  ${unlocked ? '<span class="text-[10px] bg-emerald-500 text-white px-1.5 py-0.5 rounded-full">Obtida</span>' : ''}
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${b.desc}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+      },
+
+      confirmResetProgress() {
+        const btn = document.getElementById('btn-reset-progress');
+        if (btn.dataset.confirming === 'true') {
+          localStorage.removeItem('fluentpath_progress_v1');
+          this.state.completedLessons = [];
+          this.state.xp = 0;
+          this.state.unlockedBadges = [];
+          this.state.usedAudio = false;
+          this.toggleBadgesModal(false);
+          this.showToast('Progresso reiniciado com sucesso.', 'info');
+          this.render();
+        } else {
+          btn.dataset.confirming = 'true';
+          btn.textContent = 'Clique novamente para confirmar o reset';
+          setTimeout(() => {
+            if (btn) {
+              btn.dataset.confirming = 'false';
+              btn.textContent = 'Resetar progresso salvo';
+            }
+          }, 3500);
+        }
+      },
+
+      // Sistema de Notificações Toast (Sem usar alert)
+      showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const colors = {
+          success: 'bg-emerald-600 text-white border-emerald-500',
+          error: 'bg-rose-600 text-white border-rose-500',
+          warning: 'bg-amber-500 text-slate-950 border-amber-400',
+          badge: 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white border-indigo-400',
+          info: 'bg-slate-800 text-white border-slate-700'
+        };
+        const toast = document.createElement('div');
+        toast.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-xl border text-sm font-semibold flex items-center gap-2 animate-fade-in max-w-sm ${colors[type] || colors.info}`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transition = 'opacity 0.3s ease';
+          setTimeout(() => toast.remove(), 300);
+        }, 3400);
+      },
+
+      // Atualiza Barra Superior
+      updateHeaderUI() {
+        document.getElementById('stat-xp').textContent = this.state.xp;
+        document.getElementById('stat-streak').textContent = this.state.streak;
+        document.getElementById('badge-count-pill').textContent = this.state.unlockedBadges.length;
+
+        ['basic', 'intermediate', 'advanced'].forEach(lvl => {
+          const btn = document.getElementById(`nav-lvl-${lvl}`);
+          if (!btn) return;
+          if (this.state.currentLevel === lvl) {
+            btn.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition-all';
+          } else {
+            btn.className = 'flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
+          }
+        });
+      },
+
+      // Renderização Principal
+      render() {
+        this.updateHeaderUI();
+        const root = document.getElementById('app-root');
+        if (!root) return;
+
+        if (this.state.view === 'lesson' && this.state.activeLessonId) {
+          root.innerHTML = this.renderLessonView();
+        } else {
+          root.innerHTML = this.renderDashboardView();
+        }
+      },
+
+      // TELA 1: PAINEL DO CURSO E TRILHA DE APRENDIZADO
+      renderDashboardView() {
+        const stats = this.getProgressStats();
+        const levelData = COURSE_DATA[this.state.currentLevel];
+        const lvlStat = stats.levelStats[this.state.currentLevel];
+
+        const colorMap = {
+          emerald: {
+            badge: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400',
+            bar: 'bg-emerald-500',
+            border: 'border-emerald-200 dark:border-emerald-800/60',
+            btn: 'bg-emerald-600 hover:bg-emerald-700'
+          },
+          indigo: {
+            badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400',
+            bar: 'bg-indigo-600',
+            border: 'border-indigo-200 dark:border-indigo-800/60',
+            btn: 'bg-indigo-600 hover:bg-indigo-700'
+          },
+          violet: {
+            badge: 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-400',
+            bar: 'bg-violet-600',
+            border: 'border-violet-200 dark:border-violet-800/60',
+            btn: 'bg-violet-600 hover:bg-violet-700'
+          }
+        }[levelData.color];
+
+        return `
+          <div class="animate-fade-in space-y-8">
+            <!-- Banner de Progresso Geral -->
+            <section class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-sm">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+                <div>
+                  <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full mb-2">
+                    Seu Painel de Fluência
+                  </span>
+                  <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 dark:text-white">
+                    Escolha seu nível e evolua no inglês
+                  </h1>
+                  <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    Você concluiu <strong>${stats.totalCompleted} de ${stats.totalLessons}</strong> módulos completos do curso (${stats.overallPercent}%).
+                  </p>
+                </div>
+                <div class="w-full md:w-64 bg-slate-50 dark:bg-slate-800/70 p-4 rounded-2xl border border-slate-200/70 dark:border-slate-700/60">
+                  <div class="flex justify-between text-xs font-bold mb-1.5">
+                    <span class="text-slate-600 dark:text-slate-300">Progresso Geral</span>
+                    <span class="text-indigo-600 dark:text-indigo-400">${stats.overallPercent}%</span>
+                  </div>
+                  <div class="w-full h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500" style="width: ${stats.overallPercent}%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cards de Seleção dos 3 Níveis -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                ${['basic', 'intermediate', 'advanced'].map(key => {
+                  const item = COURSE_DATA[key];
+                  const st = stats.levelStats[key];
+                  const isSelected = this.state.currentLevel === key;
+                  return `
+                    <button onclick="app.selectLevel('${key}')" class="text-left p-5 rounded-2xl border-2 transition-all ${isSelected
+                      ? 'border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/20 shadow-md'
+                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700'}">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-2xl">${item.icon}</span>
+                        <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                          CEFR ${item.cefr}
+                        </span>
+                      </div>
+                      <h2 class="font-display font-bold text-lg text-slate-900 dark:text-white">${item.title}</h2>
+                      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">${item.description}</p>
+                      <div class="mt-4">
+                        <div class="flex justify-between text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                          <span>${st.done}/${st.total} lições</span>
+                          <span>${st.percent}%</span>
+                        </div>
+                        <div class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div class="h-full bg-indigo-600 rounded-full transition-all duration-500" style="width: ${st.percent}%"></div>
+                        </div>
+                      </div>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </section>
+
+            <!-- Trilha de Lições do Nível Ativo -->
+            <section class="space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="flex items-center gap-3">
+                  <span class="text-3xl">${levelData.icon}</span>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h2 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white">
+                        Trilha: ${levelData.title}
+                      </h2>
+                      <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full ${colorMap.badge}">${levelData.cefr}</span>
+                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">${levelData.description}</p>
+                  </div>
+                </div>
+                <div class="text-xs font-bold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 self-start sm:self-auto">
+                  Concluído no nível: <span class="text-indigo-600 dark:text-indigo-400">${lvlStat.percent}%</span>
+                </div>
+              </div>
+
+              <!-- Lista de Lições -->
+              <div class="grid grid-cols-1 gap-4">
+                ${levelData.lessons.map(lesson => {
+                  const isDone = this.state.completedLessons.includes(lesson.id);
+                  return `
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border ${isDone ? 'border-emerald-300 dark:border-emerald-800/70' : 'border-slate-200 dark:border-slate-800'} shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                      <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-2xl shrink-0 flex items-center justify-center font-display font-extrabold text-lg ${isDone
+                          ? 'bg-emerald-500 text-white'
+                          : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400'}">
+                          ${isDone ? '✓' : lesson.number}
+                        </div>
+                        <div>
+                          <div class="flex flex-wrap items-center gap-2 mb-1">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Lição ${lesson.number}</span>
+                            <span class="text-slate-300 dark:text-slate-700">•</span>
+                            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">⏱️ ${lesson.duration}</span>
+                            <span class="text-slate-300 dark:text-slate-700">•</span>
+                            <span class="text-xs font-bold text-amber-600 dark:text-amber-400">⚡ +${lesson.xp} XP</span>
+                            ${isDone ? '<span class="text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 px-2.5 py-0.5 rounded-full">Concluída</span>' : ''}
+                          </div>
+                          <h3 class="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white">
+                            ${lesson.title}
+                          </h3>
+                          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                            ${lesson.summary}
+                          </p>
+                          <!-- Tags das atividades inclusas -->
+                          <div class="flex flex-wrap gap-2 mt-3">
+                            <span class="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">📘 Guia Gramatical</span>
+                            <span class="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">🔊 ${lesson.vocabulary.length} Áudios Nativos</span>
+                            <span class="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">🗂️ ${lesson.flashcards.length} Flashcards</span>
+                            <span class="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">✅ Quiz Prático</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button onclick="app.openLesson('${lesson.id}')" class="w-full sm:w-auto shrink-0 px-6 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm transition-all flex items-center justify-center gap-2 ${isDone
+                        ? 'bg-emerald-600 hover:bg-emerald-700'
+                        : 'bg-indigo-600 hover:bg-indigo-700'}">
+                        <span>${isDone ? 'Revisar Lição' : 'Estudar Agora'}</span>
+                        <span>→</span>
+                      </button>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </section>
+          </div>
+        `;
+      },
+
+      // TELA 2: AMBIENTE INTERATIVO DA LIÇÃO
+      renderLessonView() {
+        const lesson = this.getActiveLesson();
+        if (!lesson) return this.renderDashboardView();
+        const levelData = COURSE_DATA[this.state.currentLevel];
+        const isDone = this.state.completedLessons.includes(lesson.id);
+
+        const tabs = [
+          { id: 'grammar', icon: '📘', label: '1. Guia & Gramática' },
+          { id: 'vocab', icon: '🔊', label: '2. Vocabulário & Áudio' },
+          { id: 'flashcards', icon: '🗂️', label: '3. Flashcards' },
+          { id: 'quiz', icon: '✅', label: '4. Quiz Prático' }
+        ];
+
+        return `
+          <div class="animate-fade-in space-y-6">
+            <!-- Cabeçalho da Lição -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+              <div>
+                <button onclick="app.goHome()" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline mb-2">
+                  ← Voltar para a trilha (${levelData.title})
+                </button>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h1 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white">
+                    Lição ${lesson.number}: ${lesson.title}
+                  </h1>
+                  ${isDone ? '<span class="text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 px-2.5 py-0.5 rounded-full">✓ Concluída</span>' : ''}
+                </div>
+              </div>
+              <div class="flex items-center gap-2 self-start sm:self-auto">
+                <span class="text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 px-3 py-1.5 rounded-xl border border-amber-200/60 dark:border-amber-800/50">
+                  Recompensa: +${lesson.xp} XP
+                </span>
+              </div>
+            </div>
+
+            <!-- Abas de Navegação da Lição -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-800">
+              ${tabs.map(t => {
+                const active = this.state.activeTab === t.id;
+                return `
+                  <button onclick="app.setLessonTab('${t.id}')" class="px-3 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${active
+                    ? 'bg-indigo-600 text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                    <span>${t.icon}</span>
+                    <span>${t.label}</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- Conteúdo da Aba Selecionada -->
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
+              ${this.state.activeTab === 'grammar' ? this.renderGrammarTab(lesson) : ''}
+              ${this.state.activeTab === 'vocab' ? this.renderVocabTab(lesson) : ''}
+              ${this.state.activeTab === 'flashcards' ? this.renderFlashcardsTab(lesson) : ''}
+              ${this.state.activeTab === 'quiz' ? this.renderQuizTab(lesson) : ''}
+            </div>
+          </div>
+        `;
+      },
+
+      // ABA 1: GUIA GRAMATICAL E EXPLICAÇÃO
+      renderGrammarTab(lesson) {
+        const g = lesson.grammar;
+        return `
+          <div class="space-y-6 animate-fade-in">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Conceito Principal</span>
+              <h2 class="font-display font-extrabold text-2xl text-slate-900 dark:text-white mt-1">${g.title}</h2>
+              <p class="text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">${g.intro}</p>
+            </div>
+
+            <!-- Regras e Pontos-Chave -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${g.points.map(pt => `
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60">
+                  <div class="font-bold text-indigo-600 dark:text-indigo-400 text-sm mb-1">${pt.rule}</div>
+                  <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">${pt.desc}</p>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Exemplos Práticos com Áudio -->
+            <div class="space-y-3 pt-2">
+              <h3 class="font-display font-bold text-lg text-slate-900 dark:text-white">Exemplos na Prática (Clique para ouvir)</h3>
+              ${g.examples.map(ex => {
+                const safeText = ex.en.replace(/'/g, "\\'");
+                return `
+                  <div class="p-4 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/40 dark:bg-indigo-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <p class="font-bold text-slate-900 dark:text-white text-base">${ex.en}</p>
+                      <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">${ex.pt}</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <button onclick="app.speak('${safeText}', 1.0)" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors">
+                        🔊 Normal
+                      </button>
+                      <button onclick="app.speak('${safeText}', 0.65)" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1 transition-colors" title="Ouvir mais devagar">
+                        🐢 Lento
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <div class="pt-4 flex justify-end">
+              <button onclick="app.setLessonTab('vocab')" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-colors">
+                Próximo: Vocabulário & Áudio →
+              </button>
+            </div>
+          </div>
+        `;
+      },
+
+      // ABA 2: VOCABULÁRIO E PRONÚNCIA NATIVA
+      renderVocabTab(lesson) {
+        return `
+          <div class="space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 class="font-display font-extrabold text-2xl text-slate-900 dark:text-white">Vocabulário & Expressões-Chave</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Ouça a pronúncia em inglês americano (en-US) em velocidade normal ou lenta e repita em voz alta.</p>
+              </div>
+            </div>
+
+            <div class="divide-y divide-slate-200 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
+              ${lesson.vocabulary.map(item => {
+                const safeText = item.en.replace(/'/g, "\\'");
+                return `
+                  <div class="p-4 sm:p-5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div class="font-bold text-base sm:text-lg text-slate-900 dark:text-white">${item.en}</div>
+                      <div class="text-xs font-mono text-indigo-600 dark:text-indigo-400 mt-0.5">${item.phonetic}</div>
+                      <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">${item.pt}</div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                      <button onclick="app.speak('${safeText}', 1.0)" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all active:scale-95">
+                        🔊 Ouvir
+                      </button>
+                      <button onclick="app.speak('${safeText}', 0.65)" class="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1 transition-all active:scale-95">
+                        🐢 0.65x
+                      </button>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <div class="pt-4 flex flex-wrap justify-between gap-3">
+              <button onclick="app.setLessonTab('grammar')" class="px-5 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-sm transition-colors">
+                ← Guia Gramatical
+              </button>
+              <button onclick="app.setLessonTab('flashcards')" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-colors">
+                Próximo: Treinar com Flashcards →
+              </button>
+            </div>
+          </div>
+        `;
+      },
+
+      // ABA 3: FLASHCARDS INTERATIVOS 3D
+      renderFlashcardsTab(lesson) {
+        const cards = lesson.flashcards;
+        const idx = this.state.flashcardIndex;
+        const card = cards[idx];
+        const safeFront = card.front.replace(/'/g, "\\'");
+
+        return `
+          <div class="space-y-6 animate-fade-in">
+            <div class="text-center max-w-xl mx-auto">
+              <h2 class="font-display font-extrabold text-2xl text-slate-900 dark:text-white">Flashcards de Memorização Ativa</h2>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Clique no cartão para virá-lo e testar sua memória antes de ver a tradução.</p>
+            </div>
+
+            <!-- Indicador de Progresso dos Cartões -->
+            <div class="flex items-center justify-center gap-2">
+              ${cards.map((_, i) => `
+                <span class="h-2 rounded-full transition-all ${i === idx ? 'w-8 bg-indigo-600' : 'w-2 bg-slate-300 dark:bg-slate-700'}"></span>
+              `).join('')}
+            </div>
+
+            <!-- Cartão 3D Interativo -->
+            <div class="max-w-lg mx-auto perspective-1000">
+              <div onclick="app.flipFlashcard()" class="relative w-full min-h-[250px] sm:min-h-[270px] cursor-pointer transform-style-3d ${this.state.flashcardFlipped ? 'rotate-y-180' : ''}">
+                
+                <!-- Frente do Cartão (Inglês) -->
+                <div class="absolute inset-0 backface-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-xl flex flex-col items-center justify-between text-center">
+                  <div class="w-full flex items-center justify-between text-xs font-bold opacity-80">
+                    <span>INGLÊS • CARTÃO ${idx + 1}/${cards.length}</span>
+                    <button onclick="event.stopPropagation(); app.speak('${safeFront}', 1.0)" class="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold transition-colors">
+                      🔊 Ouvir
+                    </button>
+                  </div>
+                  <div class="my-auto py-4">
+                    <p class="font-display font-extrabold text-2xl sm:text-3xl leading-snug">${card.front}</p>
+                    <p class="text-xs text-indigo-100 mt-3 bg-white/10 px-3 py-1 rounded-full inline-block">💡 Dica: ${card.hint}</p>
+                  </div>
+                  <span class="text-xs font-semibold opacity-75">Toque no cartão para ver a tradução ↻</span>
+                </div>
+
+                <!-- Verso do Cartão (Português) -->
+                <div class="absolute inset-0 backface-hidden rotate-y-180 rounded-3xl p-6 sm:p-8 bg-slate-900 dark:bg-slate-800 text-white border-2 border-indigo-500 shadow-xl flex flex-col items-center justify-between text-center">
+                  <div class="w-full flex items-center justify-between text-xs font-bold text-indigo-400">
+                    <span>TRADUÇÃO EM PORTUGUÊS</span>
+                    <button onclick="event.stopPropagation(); app.speak('${safeFront}', 0.7)" class="px-3 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 font-bold transition-colors">
+                      🐢 Áudio Lento
+                    </button>
+                  </div>
+                  <div class="my-auto py-4">
+                    <p class="font-display font-extrabold text-2xl sm:text-3xl text-emerald-400 leading-snug">${card.back}</p>
+                    <p class="text-sm text-slate-400 mt-3 italic">"${card.front}"</p>
+                  </div>
+                  <span class="text-xs font-semibold text-slate-400">Toque para voltar ao inglês ↻</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Controles de Navegação dos Flashcards -->
+            <div class="flex items-center justify-center gap-3 pt-2">
+              <button onclick="app.prevFlashcard(${cards.length})" class="px-5 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-sm transition-colors">
+                ← Anterior
+              </button>
+              <button onclick="app.flipFlashcard()" class="px-5 py-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold text-sm border border-indigo-200 dark:border-indigo-800 transition-colors">
+                Virar Cartão
+              </button>
+              <button onclick="app.nextFlashcard(${cards.length})" class="px-5 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-sm transition-colors">
+                Próximo →
+              </button>
+            </div>
+
+            <div class="pt-4 flex flex-wrap justify-between gap-3 border-t border-slate-200 dark:border-slate-800">
+              <button onclick="app.setLessonTab('vocab')" class="px-5 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-sm transition-colors">
+                ← Vocabulário
+              </button>
+              <button onclick="app.setLessonTab('quiz')" class="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-colors">
+                Ir para o Quiz Prático →
+              </button>
+            </div>
+          </div>
+        `;
+      },
+
+      // ABA 4: QUIZ PRÁTICO COM FEEDBACK COMENTADO
+      renderQuizTab(lesson) {
+        const submitted = this.state.quizSubmitted;
+        let correctCount = 0;
+        if (submitted) {
+          lesson.quiz.forEach((q, idx) => {
+            if (this.state.quizAnswers[idx] === q.correct) correctCount++;
+          });
+        }
+
+        return `
+          <div class="space-y-6 animate-fade-in">
+            <div>
+              <h2 class="font-display font-extrabold text-2xl text-slate-900 dark:text-white">Quiz de Validação da Lição</h2>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Responda às questões abaixo para concluir esta lição e ganhar <strong>+${lesson.xp} XP</strong>.</p>
+            </div>
+
+            ${submitted ? `
+              <div class="p-5 rounded-2xl border ${correctCount >= Math.ceil(lesson.quiz.length * 0.6)
+                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200'}">
+                <div class="font-display font-extrabold text-lg">
+                  Resultado: Você acertou ${correctCount} de ${lesson.quiz.length} questões!
+                </div>
+                <p class="text-sm mt-1">
+                  ${correctCount >= Math.ceil(lesson.quiz.length * 0.6)
+                    ? 'Excelente trabalho! Seu progresso foi salvo automaticamente.'
+                    : 'Você precisa acertar pelo menos 2 questões para concluir a lição. Veja as explicações abaixo e tente novamente.'}
+                </p>
+              </div>
+            ` : ''}
+
+            <div class="space-y-6">
+              ${lesson.quiz.map((q, qIdx) => {
+                const userAns = this.state.quizAnswers[qIdx];
+                return `
+                  <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-3">
+                    <p class="font-bold text-base text-slate-900 dark:text-white">
+                      <span class="text-indigo-600 dark:text-indigo-400 mr-1">${qIdx + 1}.</span> ${q.question}
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      ${q.options.map((opt, optIdx) => {
+                        const isSelected = userAns === optIdx;
+                        const isCorrect = q.correct === optIdx;
+                        let btnClass = 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-indigo-400';
+
+                        if (!submitted && isSelected) {
+                          btnClass = 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-600 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-500/20';
+                        } else if (submitted) {
+                          if (isCorrect) {
+                            btnClass = 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 text-emerald-800 dark:text-emerald-200 font-bold';
+                          } else if (isSelected && !isCorrect) {
+                            btnClass = 'bg-rose-50 dark:bg-rose-950/60 border-rose-500 text-rose-800 dark:text-rose-200';
+                          } else {
+                            btnClass = 'bg-white/60 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 opacity-60';
+                          }
+                        }
+
+                        return `
+                          <button onclick="app.selectQuizOption(${qIdx}, ${optIdx})" ${submitted ? 'disabled' : ''} class="text-left p-3.5 rounded-xl border text-sm font-medium transition-all flex items-center justify-between gap-2 ${btnClass}">
+                            <span>${opt}</span>
+                            ${submitted && isCorrect ? '<span>✅</span>' : ''}
+                            ${submitted && isSelected && !isCorrect ? '<span>❌</span>' : ''}
+                          </button>
+                        `;
+                      }).join('')}
+                    </div>
+
+                    ${submitted ? `
+                      <div class="mt-3 p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                        <strong class="text-indigo-600 dark:text-indigo-400">Explicação:</strong> ${q.explanation}
+                      </div>
+                    ` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <div class="pt-4 flex flex-wrap items-center justify-between gap-3">
+              <button onclick="app.setLessonTab('flashcards')" class="px-5 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-sm transition-colors">
+                ← Flashcards
+              </button>
+
+              <div class="flex items-center gap-3">
+                ${submitted ? `
+                  <button onclick="app.retryQuiz()" class="px-5 py-3 rounded-2xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 font-bold text-sm transition-colors">
+                    Refazer Quiz
+                  </button>
+                  <button onclick="app.goHome()" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition-colors">
+                    Concluir e Voltar à Trilha →
+                  </button>
+                ` : `
+                  <button onclick="app.submitQuiz()" class="px-7 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 transition-all">
+                    Verificar Respostas ✓
+                  </button>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    };
+
+    // Garante o carregamento inicial das vozes do SpeechSynthesis
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => app.init());
+  </script>
+</body>
+</html>
